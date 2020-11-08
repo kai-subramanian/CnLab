@@ -1,11 +1,12 @@
-#include<iostream>
-#include<sys/types.h>
-#include<unistd.h>
-#include<sys/socket.h>
-#include<netdb.h>
-#include<arpa/inet.h>
-#include<string.h>
-#include<string>
+#include <iostream>
+#include <sys/types.h>
+#include <unistd.h>
+#include <sys/socket.h>
+#include <netdb.h>
+#include <arpa/inet.h>
+#include <string.h>
+#include <string>
+#include <fstream>
 using namespace std;
 int main(){
     //create a socket
@@ -56,34 +57,28 @@ int main(){
     }
     //recieveing displayed message
     char buffer[4096];
-    string cmsg = "goodbye";
-    int ex;
-    while(true){    
-        //clear buffer 
-        memset(buffer, 0, 4096);
-        //wait for message
-        int bytesrecd = recv(clientSocket, buffer, 4096, 0);
-        if(bytesrecd == -1){
-            cout<<"Connection issue"<<endl;
-            break;        
-        }
-        if (bytesrecd == 0){
-            cout<<"Client disconnected"<<endl;        
-        }
-        
-        //display it
-        string smsg = string(buffer,0,bytesrecd);
-        cout<<smsg;
-        if(smsg!=cmsg){
-            cout<<"Continue"<<endl;
-        }
-        else{
-           cout<<"Invalid"<<endl;
-        }
-        send(clientSocket, buffer,  bytesrecd+1, 0);        
+    read(clientSocket,buffer,100);
+    cout<<"File to be read is:"<<buffer<<'\n';
+    fstream fs;
+    fs.open(buffer,ios::in);
+    int br; //bytesrecived for the send function
+    if(!fs){
+        cout<<"No such file";    
     }
-    cout<<"Exiting";
+    else{
+        char ch;
+        int k=0;
+        while(!fs.eof()){
+            fs>>ch; 
+            cout<<ch;
+            buffer[k]=ch;
+            k=k+1;       
+        }
+        cout<<"\n";
+        br=k+1;           
+    }
     //close socket.
+    send(clientSocket,buffer,br,0);
     close(clientSocket);
     return 0;
 }

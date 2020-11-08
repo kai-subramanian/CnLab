@@ -6,6 +6,7 @@
 #include <arpa/inet.h>
 #include <string.h>
 #include <string>
+#include <fstream>
 using namespace std;
 int main(){
     //Create a socket
@@ -28,40 +29,13 @@ int main(){
         return 1;
     }
 
-    //While loop:
     char buffer[4096];
-    string user_ip;
-
-    while(true){
-        //Enter lines of text
-        cout << "> ";
-        getline(cin, user_ip);
-
-        //Send to server
-        int send_msg = send(sck, user_ip.c_str(), user_ip.size() + 1, 0);
-        if (send_msg == -1){
-            cout << "Could not send to server! Whoops!\r\n";
-            continue;
-        }
-        string cmsg="goodbye";
-        //Wait for response
-        memset(buffer, 0, 4096);
-        int bytesrecd = recv(sck, buffer, 4096, 0);
-        if (string(buffer,bytesrecd)==cmsg){
-            cout<<"Invalid"<<endl;        
-        }
-        
-        else if (bytesrecd == -1){
-            cout << "There was an error getting response from server\r\n";
-        }
-        
-        else{
-                        //Display response
-            cout << "SERVER> " << string(buffer, bytesrecd) << "\r\n";        
-        }
-
-    }
-
+    cout<<"Enter the filename to display: ";
+    cin>>buffer;
+    write(sck,buffer,100);
+    cout<<"Sent successfully: "<<buffer<<"\n";
+    read(sck,buffer,100);
+    cout<<"Contents are: "<<buffer<<"\n";
     //Close the socket
     close(sck);
 
